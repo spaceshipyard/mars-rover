@@ -22,11 +22,8 @@ void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.setTimeout(1000);
   // turn on motor
-  for (int i = 0; i < sizeof(allMotors); i++) {
-      AF_DCMotor motor = allMotors[i];
-      motor.setSpeed(255);
-      motor.run(RELEASE);
-  }
+  setRunForMotors(allMotors, ALL_MOTORS_SIZE, RELEASE); 
+  setMotorsSpeed(allMotors, ALL_MOTORS_SIZE, 255);
 }
 
 void setRunForMotors(AF_DCMotor motors[], int size, int dir) {
@@ -55,6 +52,11 @@ int strToDirection(String str) {
   return RELEASE;
 }
 
+void pauseBeforeChangeDirection() {
+  setRunForMotors(allMotors, ALL_MOTORS_SIZE, RELEASE); 
+  delay(100);
+}
+
 void loop() {
   
   while (Serial.available() > 0) {
@@ -63,19 +65,30 @@ void loop() {
     if (cmd == "direction") {
       String dirStr = Serial.readStringUntil(';');
       int dir = strToDirection(dirStr);
+      
+      pauseBeforeChangeDirection();      
       setRunForMotors(allMotors, ALL_MOTORS_SIZE, dir);  
+      
     } else if (cmd == "speed")  {
       String speedStr = Serial.readStringUntil(';');
-      Serial.println(speedStr);
+      
+      //pauseBeforeChangeDirection(); 
       setMotorsSpeed(allMotors, ALL_MOTORS_SIZE, speedStr.toInt());
+      
     } else if (cmd == "dir-left") {
       String dirStr = Serial.readStringUntil(';');
-      int dir = strToDirection(dirStr);
-      setRunForMotors(motorGroupLeft, SIDE_MOTORS_SIZE, dir);  
+
+      pauseBeforeChangeDirection();      
+      setRunForMotors(motorGroupLeft, SIDE_MOTORS_SIZE, FORWARD);  
+      setRunForMotors(motorGroupRight, SIDE_MOTORS_SIZE, BACKWARD); 
+       
     } else if (cmd == "dir-right") {
       String dirStr = Serial.readStringUntil(';');
-      int dir = strToDirection(dirStr);
-      setRunForMotors(motorGroupRight, SIDE_MOTORS_SIZE, dir);  
+
+      pauseBeforeChangeDirection();
+      setRunForMotors(motorGroupLeft, SIDE_MOTORS_SIZE, BACKWARD);  
+      setRunForMotors(motorGroupRight, SIDE_MOTORS_SIZE, FORWARD);  
+      
     }
   }
   
