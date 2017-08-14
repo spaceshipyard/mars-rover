@@ -1,12 +1,9 @@
 #include <Arduino.h>
 #include <MotorShieldMovingPlatform.h>
-#include <Controller.h>
-
-
-
+#include <MarsRoverController.h>
 
 MotorShieldMovingPlatform movingPlatform;
-Controller ctrl(movingPlatform);
+MarsRoverController ctrl(&movingPlatform);
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
